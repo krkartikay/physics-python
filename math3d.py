@@ -1,17 +1,35 @@
+import math
+
 class vec3():
 	def __init__(self, x, y=None, z=None):
 		if y is None and z is None:
 			self.xyz = tuple(x)
 		else:
 			self.xyz = (x,y,z)
+	def length(self):
+		return math.sqrt(self * self)
 	def __add__(self, other):
 		return vec3(x+y for (x,y) in zip(self.xyz, other.xyz))
 	def __mul__(self, num):
-		return vec3(num*x for x in self.xyz)
+		if type(num) == vec3:
+			other = num
+			return sum(x*y for (x,y) in zip(self.xyz, other.xyz))
+		else:
+			return vec3(num*x for x in self.xyz)
 	def __div__(self, num):
 		return vec3(x/num for x in self.xyz)
 	__rmul__ = __mul__
 	__floordiv__ = __div__
 	__truediv__ = __div__
 	def __repr__(self):
-		return "<%0.2f, %0.2f, %0.2f>"%self.xyz
+		return "vec3<%0.4f, %0.4f, %0.4f>"%self.xyz
+	def __eq__(self, other):
+		eps = 1e-4
+		if isinstance(other, self.__class__):
+			return all(abs(x - y) < eps for (x,y) in zip(self.xyz, other.xyz))
+		elif isinstance(other, tuple):
+			return all(abs(x - y) < eps for (x,y) in zip(self.xyz, other))
+		else:
+			return False
+	def __nq__(self, other):
+		return not self.__eq__(other)

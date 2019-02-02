@@ -17,19 +17,27 @@ class Universe():
 		F = vec3(0,0,0)
 		for force in self.forces:
 			F += force(p)
-		return F		
+		return F
 
 	def step(self):
 		"Forward Euler Step Forward"
 		# for each particle calculate total force acting on it
-		particles = filter(lambda p: type(p)==Particle, self.objects)
-		timestep = self.timestep
+		dt = self.timestep
+		particles = filter(lambda p: isinstance(p, Particle), self.objects)
 		for p in particles:
 			F = self.getForce(p)
 			acc = F/p.mass
-			p.pos += timestep * p.vel
-			p.vel += timestep * F
-		self.time += timestep
+			p._new_pos = p.pos + dt * p.vel
+			p._new_vel = p.vel + dt * acc
+		# for double buffering
+		particles = filter(lambda p: isinstance(p, Particle), self.objects)
+		for p in particles:
+			p.update()
+		self.time += dt
+
+	def run(self, time = 1):
+		while abs(self.time - time) > 1e-7:
+			self.step()
 
 class Particle():
 	def __init__(self, pos, vel, mass):
@@ -37,6 +45,23 @@ class Particle():
 		self.vel = vec3(vel)
 		self.mass = mass
 		self.universe = None
+		self.connections = []
+		self._new_pos = None
+		self._new_vel = None
+
+	def update(self):
+		self.pos = self._new_pos
+		self.vel = self._new_vel
+
+class Spring():
+	def __init__(self, p1, p2, k = 1.0, l = None):
+		self.p1 = p1
+		self.p2 = p2
+		self.k = k
+		if l is not None:
+			self.l = l
+		else:
+			self.l = (p1-p2).length()
 
 def GravityForce(p):
 	g = vec3(0,0,-9.8)
