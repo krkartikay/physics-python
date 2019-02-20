@@ -1,13 +1,29 @@
-"Single particle under influence of gravity"
+"""
+Server Backend
+"""
 
 import physics
 
-u = physics.Universe(forces=[physics.GravityForce])
+from flask import Flask
+from flask_socketio import SocketIO
 
-p = physics.Particle((0,0,0), (1,0,10), 1)
+# u = physics.Universe(forces=[physics.GravityForce])
 
-u.add(p)
+# p = physics.Particle((0,0,0), (1,0,10), 1)
 
-while p.pos.xyz[2] >= 0:
-	print("%0.3f"%u.time, p.pos)
-	u.step()
+# u.add(p)
+
+# while p.pos.xyz[2] >= 0:
+# 	print("%0.3f"%u.time, p.pos)
+# 	u.step()
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+@socketio.on('join')
+def on_join(data):
+	print("YES")
+
+if __name__ == '__main__':
+	socketio.run(app, port=5000, debug=True)
