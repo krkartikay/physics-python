@@ -3,15 +3,16 @@ from math3d import vec3
 # all units are in SI
 
 class Universe():
-	def __init__(self, forces, timestep=0.001):
+	def __init__(self, forces=[], timestep=0.001):
 		self.forces = forces
-		self.objects = []
+		self.particles = []
 		self.time = 0
 		self.timestep = timestep
 
 	def add(self, p):
-		self.objects += [p]
-		p.universe = self
+		if isinstance(p, Particle):
+			self.particles += [p]
+			p.universe = self
 
 	def getForce(self, p):
 		F = vec3(0,0,0)
@@ -23,21 +24,25 @@ class Universe():
 		"Forward Euler Step Forward"
 		# for each particle calculate total force acting on it
 		dt = self.timestep
-		particles = filter(lambda p: isinstance(p, Particle), self.objects)
-		for p in particles:
+		for p in self.particles:
 			F = self.getForce(p)
 			acc = F/p.mass
 			p._new_pos = p.pos + dt * p.vel
 			p._new_vel = p.vel + dt * acc
 		# for double buffering
-		particles = filter(lambda p: isinstance(p, Particle), self.objects)
-		for p in particles:
+		for p in self.particles:
 			p.update()
 		self.time += dt
 
 	def run(self, time = 1):
 		while abs(self.time - time) > 1e-7:
 			self.step()
+		
+	def data(self):
+		data = {}
+		for i,p in enumerate(self.particles):
+			data['p'+str(i+1)] = p.data()
+		return data
 
 class Particle():
 	def __init__(self, pos, vel, mass):
@@ -52,6 +57,9 @@ class Particle():
 	def update(self):
 		self.pos = self._new_pos
 		self.vel = self._new_vel
+	
+	def data(self):
+		return {'pos': self.pos.data(), 'vel': self.vel.data(), 'mass': self.mass}
 
 class Spring():
 	def __init__(self, p1, p2, k = 1.0, l = None):

@@ -33,3 +33,5 @@ class vec3():
 			return False
 	def __nq__(self, other):
 		return not self.__eq__(other)
+	def data(self):
+		return [i for i in self.xyz]
