@@ -39,10 +39,8 @@ class Universe():
 			self.step()
 		
 	def data(self):
-		data = {}
-		for i,p in enumerate(self.particles):
-			data['p'+str(i+1)] = p.data()
-		return data
+		pdata = [p.data() for p in self.particles]
+		return {'particles': pdata}
 
 class Particle():
 	def __init__(self, pos, vel, mass):

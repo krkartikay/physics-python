@@ -7,16 +7,6 @@ import physics
 from flask import *
 from flask_socketio import SocketIO
 
-# u = physics.Universe(forces=[physics.GravityForce])
-
-# p = physics.Particle((0,0,0), (1,0,10), 1)
-
-# u.add(p)
-
-# while p.pos.xyz[2] >= 0:
-# 	print("%0.3f"%u.time, p.pos)
-# 	u.step()
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
@@ -34,6 +24,9 @@ def create_particle(pos, vel, mass):
 
 @socketio.on('step')
 def take_step():
+	# TODO: Isn't this wrong?
+	# Putting a blocking operation in the main thread
+	# How do I fix this?
 	univ[request.sid].step()
 
 @socketio.on('data')
