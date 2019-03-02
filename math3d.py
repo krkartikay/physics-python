@@ -8,8 +8,14 @@ class vec3():
 			self.xyz = (x,y,z)
 	def length(self):
 		return math.sqrt(self * self)
+	def unit(self):
+		return self / self.length()
 	def __add__(self, other):
 		return vec3(x+y for (x,y) in zip(self.xyz, other.xyz))
+	def __sub__(self, other):
+		return self + (-1)*other
+	def __neg__(self):
+		return self * (-1)
 	def __mul__(self, num):
 		if type(num) == vec3:
 			other = num

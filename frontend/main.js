@@ -3,10 +3,56 @@ var t = 0;
 var curdata = {};
 var w = window.innerWidth;
 var h = window.innerHeight;
+var running = true;
+
+var xScale = d3.scaleLinear()
+    .domain([-30, 30])
+    .range([0, w]);
+var yScale = d3.scaleLinear()
+    .domain([-20, 20])
+    .range([h, 0]);
+var massScale = d3.scaleLinear()
+    .domain([0, 10])
+    .range([0, 50]);
+
+// ===========================================================================
+
+function initPhysics() {
+    // s.emit("particle", [0, 0, 0], [2.5, 0, 5], 1);
+    s.emit("init");
+}
+
+// ---------------------------------------------------------------------------
+
+function drawdata(data) {
+    var circles = d3.select("#draw")
+        .selectAll("circle")
+        .data(data.particles);
+    circles
+        .enter()
+        .append("circle")
+        .attr("class", "particle")
+    circles
+        .attr("cx", (d) => xScale(d.pos[0]))
+        .attr("cy", (d) => yScale(d.pos[2]))
+        .attr("r", (d) => massScale(d.mass));
+    // TODO later on add code to show results in 3D
+}
+
+// ---------------------------------------------------------------------------
 
 function setup() {
-    s.emit("particle", [1, 0, 1], [3, 0, 5], 1);
+    initDrawing();
+    initPhysics();
     loop();
+}
+
+
+function initDrawing() {
+    var xAxis = d3.axisBottom(xScale);
+    var yAxis = d3.axisLeft(yScale);
+    d3.select("#xAxis").call(xAxis).attr("transform", `translate(0,${h / 2})`);
+    d3.select("#yAxis").call(yAxis).attr("transform", `translate(${w / 2},0)`);
 }
 
 function loop() {
@@ -16,33 +62,11 @@ function loop() {
     });
     s.emit("step");
     t += 1;
-    requestAnimationFrame(loop);
+    if (running) requestAnimationFrame(loop);
 }
 
 function stop() {
-    clearInterval(intervalId);
+    running = false;
 }
 
 $(setup);
-
-// ---------------------------------------------------------------------------
-
-function drawdata(data) {
-    var xscale = d3.scaleLinear()
-        .domain([-30, 30])
-        .range([0, w]);
-    var yscale = d3.scaleLinear()
-        .domain([-20, 20])
-        .range([h, 0]);
-    var circles = d3.select("#draw")
-        .selectAll("circle")
-        .data(data.particles);
-    circles
-        .enter()
-        .append("circle")
-        .attr("class", "particle")
-    circles
-        .attr("cx", (d) => xscale(d.pos[0]))
-        .attr("cy", (d) => yscale(d.pos[2])) // temporary workaround TODO -- set up some 3d projection
-        .attr("r", (d) => (d.mass * 10));
-}

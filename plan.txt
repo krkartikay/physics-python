@@ -1,0 +1,9 @@
+- [ ] implement springs
+- [ ] display springs
+- [ ] implement collisions
+- [ ] implement walls
+- [ ] implement boxes
+- [ ] make display better
+- [ ] work on buttons in frontend
+
+that's it!
