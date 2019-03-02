@@ -1,6 +1,8 @@
 var s = io("http://localhost:5000");
 var t = 0;
 var curdata = {};
+var w = window.innerWidth;
+var h = window.innerHeight;
 
 function setup() {
     s.emit("particle", [1, 0, 1], [3, 0, 5], 1);
@@ -26,6 +28,12 @@ $(setup);
 // ---------------------------------------------------------------------------
 
 function drawdata(data) {
+    var xscale = d3.scaleLinear()
+        .domain([-30, 30])
+        .range([0, w]);
+    var yscale = d3.scaleLinear()
+        .domain([-20, 20])
+        .range([h, 0]);
     var circles = d3.select("#draw")
         .selectAll("circle")
         .data(data.particles);
@@ -34,7 +42,7 @@ function drawdata(data) {
         .append("circle")
         .attr("class", "particle")
     circles
-        .attr("cx", (d) => (d.pos[0] * 100))
-        .attr("cy", (d) => (d.pos[2] * 100)) // temporary workaround TODO
+        .attr("cx", (d) => xscale(d.pos[0]))
+        .attr("cy", (d) => yscale(d.pos[2])) // temporary workaround TODO -- set up some 3d projection
         .attr("r", (d) => (d.mass * 10));
 }
