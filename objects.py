@@ -44,3 +44,6 @@ class Spring():
 			return force
 		else:
 			return -self.getForce(self.p1)
+
+	def data(self):
+		return {'p1': self.p1.pos.data(), 'p2': self.p2.pos.data()}

@@ -6,16 +6,20 @@ class Universe():
 	def __init__(self, timestep=0.001):
 		self.forces = []
 		self.particles = []
+		self.springs = []
 		self.time = 0
 		self.timestep = timestep
 	
 	def addForce(self, f):
 		self.forces += [f]
 
-	def add(self, p):
-		if isinstance(p, Particle):
-			self.particles += [p]
-			p.universe = self
+	def add(self, x):
+		if isinstance(x, Particle):
+			self.particles += [x]
+			x.universe = self
+		elif isinstance(x, Spring):
+			self.springs += [x]
+			x.universe = self
 
 	def getForce(self, p):
 		F = vec3(0,0,0)
@@ -43,4 +47,5 @@ class Universe():
 		
 	def data(self):
 		pdata = [p.data() for p in self.particles]
-		return {'particles': pdata}
+		sdata = [s.data() for s in self.springs]
+		return {'particles': pdata, 'springs': sdata}

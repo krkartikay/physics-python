@@ -36,6 +36,19 @@ function drawdata(data) {
         .attr("cx", (d) => xScale(d.pos[0]))
         .attr("cy", (d) => yScale(d.pos[2]))
         .attr("r", (d) => massScale(d.mass));
+    var springs = d3.select("#draw")
+        .selectAll("line.spring")
+        .data(data.springs);
+    springs
+        .enter()
+        .append("line")
+        .attr("class", "spring");
+    springs
+        .attr("x1", (d) => xScale(d.p1[0]))
+        .attr("x2", (d) => xScale(d.p2[0]))
+        .attr("y1", (d) => yScale(d.p1[2]))
+        .attr("y2", (d) => yScale(d.p2[2]))
+        .attr("stroke", "#fff");
     // TODO later on add code to show results in 3D
 }
 

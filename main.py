@@ -28,6 +28,7 @@ def on_init():
 	s = physics.Spring(p1, p2)
 	univ[request.sid].add(p1)
 	univ[request.sid].add(p2)
+	univ[request.sid].add(s)
 
 @socketio.on('particle')
 def create_particle(pos, vel, mass):
