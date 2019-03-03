@@ -8,6 +8,7 @@ class Universe():
 		self.particles = []
 		self.springs = []
 		self.time = 0
+		self.steps = 0
 		self.timestep = timestep
 		self.k, self.v = 0, 0
 	
@@ -41,7 +42,10 @@ class Universe():
 		for p in self.particles:
 			p.update()
 		self.time += dt
+		self.steps += 1
 		self.updateEnergy()
+		if self.steps % 1e3 == 0:
+			self.infolog()
 
 	def run(self, time = 1):
 		while abs(self.time - time) > 1e-7:
@@ -62,9 +66,12 @@ class Universe():
 		for p in self.particles:
 			if isinstance(p, FixedParticle):
 				continue
-			self.k += (p.vel.length() ** 2)
+			self.k += (p.mass * p.vel.length() ** 2) / 2
 			if gravity is not None:
-				self.v += (- gravity.g * p.pos)
+				self.v += (- p.mass * gravity.g * p.pos)
+			for s in self.springs:
+				extension = (s.p1.pos - s.p2.pos).length() - s.l
+				self.v += (s.k * extension ** 2) / 2
 	
 	def infolog(self):
-		print("total <K, V, E>: %f\t%f\t%f" % (self.k, self.v, self.k+self.v))
+		print("total <K, V, E>:\t%f\t%f\t%f" % (self.k, self.v, self.k+self.v))

@@ -23,7 +23,7 @@ def on_connect():
 @socketio.on('init')
 def on_init():
 	p1 = physics.FixedParticle((0, 0, 5), (0, 0, 0), 1)
-	p2 = physics.Particle((0, 0, 0), (1, 0, 0), 1)
+	p2 = physics.Particle((0, 0, 0), (2, 0, 0), 1)
 	s1 = physics.Spring(p1, p2)
 	univ[request.sid].add(p1)
 	univ[request.sid].add(p2)
@@ -38,13 +38,11 @@ def create_particle(pos, vel, mass):
 def take_step():
 	# TODO: Should this be done in the background?
 	univ[request.sid].step()
-	univ[request.sid].infolog()
 
 @socketio.on('step')
 def step_num(num):
 	for i in range(num):
 		univ[request.sid].step()
-	univ[request.sid].infolog()
 
 @socketio.on('data')
 def send_data():

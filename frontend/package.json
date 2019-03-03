@@ -1,8 +1,11 @@
 {
-    "name": "python_physics",
-    "version": "0.0.1",
-    "dependencies": {
-        "d3": "5.9.1",
-        "jquery": "3.3.1"
-    }
+  "name": "python_physics",
+  "version": "0.0.1",
+  "dependencies": {
+    "d3": "5.9.1",
+    "jquery": "3.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.15.0"
+  }
 }
