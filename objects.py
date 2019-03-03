@@ -20,6 +20,15 @@ class Particle():
 	def data(self):
 		return {'pos': self.pos.data(), 'vel': self.vel.data(), 'mass': self.mass}
 
+class FixedParticle(Particle):
+	def update(self):
+		self.pos = self.pos
+		self.vel = vec3(0,0,0)
+	
+	def data(self):
+		d = super().data()
+		d['type'] = 'fixed'
+		return d
 
 class Spring():
 	def __init__(self, p1: Particle, p2: Particle, k=1.0, l=None):

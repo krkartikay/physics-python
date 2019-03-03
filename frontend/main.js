@@ -31,7 +31,7 @@ function drawdata(data) {
     circles
         .enter()
         .append("circle")
-        .attr("class", "particle")
+        .attr("class", (d) => d.type == "fixed" ? "particle fixed" : "particle")
     circles
         .attr("cx", (d) => xScale(d.pos[0]))
         .attr("cy", (d) => yScale(d.pos[2]))
@@ -73,7 +73,7 @@ function loop() {
         curdata = data;
         drawdata(data);
     });
-    s.emit("step");
+    s.emit("step", 10);
     t += 1;
     if (running) requestAnimationFrame(loop);
 }

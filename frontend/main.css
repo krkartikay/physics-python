@@ -22,6 +22,10 @@ circle.particle{
     stroke: #fff;
 }
 
+circle.particle.fixed{
+    stroke: #f00;
+}
+
 .mainAxis {
     color: #999;
 }

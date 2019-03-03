@@ -1,5 +1,5 @@
 from math3d import vec3
-from objects import Spring
+from objects import *
 
 class Force():
 	def __init__(self):
@@ -23,4 +23,12 @@ class SpringForce(Force):
 		for s in p.connections:
 			if isinstance(s, Spring):
 				F += s.getForce(p)
+		return F
+
+class DragForce(Force):
+	def __init__(self, a=0.02):
+		self.a = a
+
+	def getForce(self, p: Particle):
+		F = - self.a * p.vel * p.vel.length()
 		return F
