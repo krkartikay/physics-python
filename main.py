@@ -20,7 +20,6 @@ def on_connect():
 @socketio.on('init')
 def init_forces(forces):
 	for f in forces:
-		print("xxxxx", f)
 		if isinstance(f, list):
 			args = f[1]
 			f = f[0]
