@@ -31,12 +31,13 @@ class FixedParticle(Particle):
 		return d
 
 class Spring():
-	def __init__(self, p1: Particle, p2: Particle, k=1.0, l=None):
+	def __init__(self, p1: Particle, p2: Particle, k=1.0, l=None, damping=0.0):
 		self.p1 = p1
 		self.p2 = p2
 		p1.connections += [self]
 		p2.connections += [self]
 		self.k = k
+		self.c = damping
 		if l is not None:
 			self.l = l
 		else:
@@ -46,13 +47,21 @@ class Spring():
 		if not (p is self.p1 or p is self.p2):
 			return vec3(0, 0, 0)
 		elif p is self.p1:
-			extension = (self.p1.pos - self.p2.pos).length() - self.l
-			magnitude = self.k*extension
+			extension = (self.p2.pos - self.p1.pos).length() - self.l
 			direction = (self.p2.pos - self.p1.pos).unit()
+			springforce_magnitude = self.k*extension
+			dampingforce_magnitude = self.c * (self.p1.vel * direction)
+			magnitude = springforce_magnitude - dampingforce_magnitude
 			force = magnitude * direction
 			return force
 		else:
-			return -self.getForce(self.p1)
+			extension = (self.p1.pos - self.p2.pos).length() - self.l
+			direction = (self.p1.pos - self.p2.pos).unit()
+			springforce_magnitude = self.k*extension
+			dampingforce_magnitude = self.c * (self.p2.vel * direction)
+			magnitude = springforce_magnitude - dampingforce_magnitude
+			force = magnitude * direction
+			return force
 
 	def data(self):
 		return {'p1': self.p1.pos.data(), 'p2': self.p2.pos.data()}

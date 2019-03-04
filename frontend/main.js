@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* global io,d3,$ */
 var s = io("http://localhost:5000");
 var t = 0;
 var curdata = {};
