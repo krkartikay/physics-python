@@ -28,10 +28,21 @@ var massScale = d3.scaleLinear()
 // ===========================================================================
 
 async function initPhysics() {
-    await s.get("init", [["GravityForce", {"g": [0,0,1]}], "SpringForce", "DragForce"])
-    var p1 = await s.get("particle", [0, 0, 0], [2, 0, 0], 1);
-    var p2 = await s.get("fixed_particle", [0, 0, 5], 1);
-    var sp = await s.get("spring", p1, p2, {"k":1000, "damping": 1});
+    await s.get("init", ["SpringForce", "GravityForce"])
+    var parts = {};
+    var max = 10;
+    for (let i = -max + 1; i <= max - 1; i++) {
+        var z = 0;
+        // z = 5*Math.cos(i);
+        parts[i] = await s.get("particle", [i, 0, 0], [0, 0, z], 1);
+    }
+    var p_first = await s.get("fixed_particle", [-max, 0, 0], 1);
+    var p_last = await s.get("fixed_particle", [max, 0, 0], 1);
+    parts[-max] = p_first;
+    parts[max] = p_last;
+    for (let i = -max; i < max; i++) {
+        await s.get("spring", parts[i], parts[i+1], {"k":100, "damping": 5});
+    }
 }
 
 // ---------------------------------------------------------------------------

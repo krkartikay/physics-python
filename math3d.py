@@ -2,6 +2,9 @@ import math
 
 class vec3():
 	def __init__(self, x, y=None, z=None):
+		if isinstance(x, vec3):
+			self.xyz = x.xyz
+			return
 		if y is None and z is None:
 			self.xyz = tuple(x)
 		else:

@@ -13,12 +13,9 @@ socketio = SocketIO(app)
 
 univ = {}
 
-@socketio.on('connect')
-def on_connect():
-	univ[request.sid] = physics.Universe()
-
 @socketio.on('init')
-def init_forces(forces):
+def init_physics(forces, timestep=0.001):
+	univ[request.sid] = physics.Universe(timestep=timestep)
 	for f in forces:
 		if isinstance(f, list):
 			args = f[1]
