@@ -12,21 +12,24 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 univ = {}
+f = []
+f_reqs = 0
 
 @socketio.on('init')
-def init_physics(forces, timestep=0.001):
+def init_physics(timestep=0.001):
 	univ[request.sid] = physics.Universe(timestep=timestep)
-	for f in forces:
-		if isinstance(f, list):
-			args = f[1]
-			f = f[0]
-		else:
-			args = {}
-		try:
-			f = getattr(physics, f)
-			univ[request.sid].addForce(f(**args))
-		except AttributeError:
-			return "Failed"
+	return 1
+
+@socketio.on('reload_file')
+def reload_file():
+	global f
+	f = open("data.txt").readlines()
+	return 1
+
+@socketio.on('add_force')
+def add_force(forcename, options={}):
+	force = getattr(physics, forcename)
+	univ[request.sid].addForce(force(**options))
 
 @socketio.on('ping')
 def ping(*data):
@@ -43,25 +46,31 @@ def create_fixed_particle(pos, mass):
 	return univ[request.sid].add(p)  # returns particle id
 
 @socketio.on('spring')
-def create_spring(pid1, pid2, options):
+def create_spring(pid1, pid2, options={}):
 	p1 = univ[request.sid].objects[pid1]
 	p2 = univ[request.sid].objects[pid2]
 	sp = physics.Spring(p1, p2, **options)
 	return univ[request.sid].add(sp)  # returns spring id
 
-@socketio.on('step')
-def take_step():
-	# TODO: Should this be done in the background?
-	univ[request.sid].step()
+@socketio.on('impulse')
+def create_impulse(pid, options={}):
+	p = univ[request.sid].objects[pid]
+	p.connections += [physics.Impulse(**options)]
 
 @socketio.on('step')
-def step_num(num):
+def step_num(num=1):
 	for i in range(num):
+		# TODO: Should this be done in the background?
 		univ[request.sid].step()
+	return True
 
 @socketio.on('data')
 def send_data():
 	return univ[request.sid].data()
+
+@socketio.on('saved_data')
+def send_saved_data(i):
+	return eval(f[i%len(f)])
 
 if __name__ == '__main__':
 	socketio.run(app, port=5000, debug=True)

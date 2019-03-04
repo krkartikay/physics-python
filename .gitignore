@@ -1,6 +1,7 @@
 frontend/node_modules/
 .eslintrc.json
 .vscode/
+data.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

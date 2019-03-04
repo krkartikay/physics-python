@@ -9,45 +9,57 @@ s.get = function (event, ...payload) {
 }
 // ============================================================================
 
-var t = 0;
+var frames = 0;
 var data = {};
 var w = window.innerWidth;
 var h = window.innerHeight;
 var running = true;
+var zoom = 0.5;
+var time = 0;
+var timestep = 0.00025;
 
 var xScale = d3.scaleLinear()
-    .domain([-30, 30])
+    .domain([-15 / zoom, 15 / zoom])
     .range([0, w]);
 var yScale = d3.scaleLinear()
-    .domain([-20, 20])
+    .domain([-10 / zoom, 10 / zoom])
     .range([h, 0]);
 var massScale = d3.scaleLinear()
-    .domain([0, 10])
+    .domain([0, 10 / zoom])
     .range([0, 50]);
 
 // ===========================================================================
 
 async function initPhysics() {
-    await s.get("init", ["SpringForce", "GravityForce"])
+    await s.get("init", timestep);
+    await s.get("add_force", "SpringForce")
+    await s.get("add_force", "ImpulsiveForce")
     var parts = {};
-    var max = 10;
+    var max = 25;
     for (let i = -max + 1; i <= max - 1; i++) {
-        var z = 0;
-        // z = 5*Math.cos(i);
-        parts[i] = await s.get("particle", [i, 0, 0], [0, 0, z], 1);
+        parts[i] = await s.get("particle", [i, 0, 0], [0, 0, 0], 1);
+    }
+    for (let x = 0; x <= 2*Math.PI/10; x += 0.01) {
+        await s.get("impulse", parts[-5],
+            {
+                'start': x,
+                'end': (x+0.01),
+                'force': [0, 0, +500*Math.cos(10*x)]
+            }
+        );
     }
     var p_first = await s.get("fixed_particle", [-max, 0, 0], 1);
     var p_last = await s.get("fixed_particle", [max, 0, 0], 1);
     parts[-max] = p_first;
     parts[max] = p_last;
     for (let i = -max; i < max; i++) {
-        await s.get("spring", parts[i], parts[i+1], {"k":100, "damping": 5});
+        await s.get("spring", parts[i], parts[i + 1], { "k": 1000, "l": 0.25 });
     }
 }
 
 // ---------------------------------------------------------------------------
 
-function drawdata(data) {
+function drawdata(data, t) {
     var circles = d3.select("#draw")
         .selectAll("circle")
         .data(data.particles);
@@ -91,16 +103,44 @@ function initDrawing() {
     d3.select("#yAxis").call(yAxis).attr("transform", `translate(${w / 2},0)`);
 }
 
-async function loop() {
-    data = await s.get("data");
-    if(data) drawdata(data);
-    s.emit("step", 10);
-    t += 1;
-    if (running) requestAnimationFrame(loop);
+function loop() {
+    s.emit("step", 1, function (t) {
+        s.emit("data", function (d) {
+            data = d;
+            drawdata(data, t);
+            frames += 1;
+            time += timestep;
+            if (running) requestAnimationFrame(loop);
+        });
+    });
 }
 
-function stop() {
-    running = false;
-}
+var realtime = 0;
+
+var log_interval = setInterval(() => {
+    console.log("t, fps: ", time, frames / 1);
+    frames = 0;
+}, 1000);
 
 $(setup);
+
+// ==============================================================================
+
+function stop() {
+    clearInterval(log_interval)
+    running = false;
+    s.get("reload_file");
+}
+
+var saved_data;
+
+var ix = 0;
+
+async function replay_loop() {
+    data = await s.get("saved_data", ix);
+    ix += 1;
+    drawdata(data);
+    requestAnimationFrame(replay_loop);
+}
+
+stop(); replay_loop();

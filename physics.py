@@ -1,9 +1,10 @@
+import math
 from math3d import vec3
 from objects import *
 from forces import *
 
 class Universe():
-	def __init__(self, timestep=0.001, logging=True):
+	def __init__(self, timestep=0.001):
 		self.forces = []
 		self.particles = []
 		self.springs = []
@@ -13,7 +14,7 @@ class Universe():
 		self.k, self.v = 0, 0
 		self.objects = {}
 		self.max_id = 0
-		self.logging = logging
+		self.resolution = - int(math.log10(timestep))
 	
 	def addForce(self, f):
 		self.forces += [f]
@@ -48,9 +49,6 @@ class Universe():
 		for p in self.particles:
 			p.update()
 		self.time += dt
-		self.updateEnergy()
-		if self.logging and self.steps % 1e3 == 0:
-			self.infolog()
 		self.steps += 1
 
 	def run(self, time = 1):
@@ -60,7 +58,7 @@ class Universe():
 	def data(self):
 		pdata = [p.data() for p in self.particles]
 		sdata = [s.data() for s in self.springs]
-		return {'particles': pdata, 'springs': sdata}
+		return {'t': round(self.time, self.resolution), 'particles': pdata, 'springs': sdata}
 	
 	def updateEnergy(self):
 		self.k,self.v = 0,0
@@ -75,9 +73,10 @@ class Universe():
 			self.k += (p.mass * p.vel.length() ** 2) / 2
 			if gravity is not None:
 				self.v += (- p.mass * gravity.g * p.pos)
-			for s in self.springs:
-				extension = (s.p1.pos - s.p2.pos).length() - s.l
-				self.v += (s.k * extension ** 2) / 2
+		for s in self.springs:
+			extension = (s.p1.pos - s.p2.pos).length() - s.l
+			self.v += (s.k * extension ** 2) / 2
 	
 	def infolog(self):
-		print("<t, K, V, E>:\t%.2f\t%f\t%f\t%f" % (self.time, self.k, self.v, self.k+self.v))
+		self.updateEnergy()
+		print("<t, K, V, E>:\t%.5f\t%f\t%f\t%f" % (self.time, self.k, self.v, self.k+self.v))

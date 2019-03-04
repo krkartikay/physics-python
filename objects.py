@@ -37,6 +37,7 @@ class Spring():
 		p1.connections += [self]
 		p2.connections += [self]
 		self.k = k
+		self.k2 = k/100
 		self.c = damping
 		if l is not None:
 			self.l = l
@@ -65,3 +66,15 @@ class Spring():
 
 	def data(self):
 		return {'p1': self.p1.pos.data(), 'p2': self.p2.pos.data()}
+
+class Impulse():
+	def __init__(self, start=0, end=1, force=(0,0,0)):
+		self.start = start
+		self.end = end
+		self.force = vec3(force)
+	
+	def getForce(self, p):
+		if self.start <= p.universe.time <= self.end:
+			return self.force
+		else:
+			return vec3(0,0,0)
