@@ -1,8 +1,16 @@
-/* eslint-disable no-unused-vars */
-/* global io,d3,$ */
 var s = io("http://localhost:5000");
+// use like: resp = await s.get("ping", "data")
+s.get = function (event, ...payload) {
+    return new Promise(function (resolve, reject) {
+        return s.emit(event, ...payload, function (...args) {
+            return resolve(...args);
+        })
+    })
+}
+// ============================================================================
+
 var t = 0;
-var curdata = {};
+var data = {};
 var w = window.innerWidth;
 var h = window.innerHeight;
 var running = true;
@@ -19,9 +27,11 @@ var massScale = d3.scaleLinear()
 
 // ===========================================================================
 
-function initPhysics() {
-    // s.emit("particle", [0, 0, 0], [2.5, 0, 5], 1);
-    s.emit("init");
+async function initPhysics() {
+    await s.get("init", [["GravityForce", {"g": [0,0,1]}], "SpringForce", "DragForce"])
+    var p1 = await s.get("particle", [0, 0, 0], [2, 0, 0], 1);
+    var p2 = await s.get("fixed_particle", [0, 0, 5], 1);
+    var sp = await s.get("spring", p1, p2, {"k":1000, "damping": 1});
 }
 
 // ---------------------------------------------------------------------------
@@ -56,9 +66,9 @@ function drawdata(data) {
 
 // ---------------------------------------------------------------------------
 
-function setup() {
+async function setup() {
     initDrawing();
-    initPhysics();
+    await initPhysics();
     loop();
 }
 
@@ -70,11 +80,9 @@ function initDrawing() {
     d3.select("#yAxis").call(yAxis).attr("transform", `translate(${w / 2},0)`);
 }
 
-function loop() {
-    s.emit("data", (data) => {
-        curdata = data;
-        drawdata(data);
-    });
+async function loop() {
+    data = await s.get("data");
+    if(data) drawdata(data);
     s.emit("step", 10);
     t += 1;
     if (running) requestAnimationFrame(loop);

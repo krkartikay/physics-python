@@ -3,7 +3,7 @@ from objects import *
 from forces import *
 
 class Universe():
-	def __init__(self, timestep=0.001):
+	def __init__(self, timestep=0.001, logging=True):
 		self.forces = []
 		self.particles = []
 		self.springs = []
@@ -11,6 +11,9 @@ class Universe():
 		self.steps = 0
 		self.timestep = timestep
 		self.k, self.v = 0, 0
+		self.objects = {}
+		self.max_id = 0
+		self.logging = logging
 	
 	def addForce(self, f):
 		self.forces += [f]
@@ -22,6 +25,9 @@ class Universe():
 		elif isinstance(x, Spring):
 			self.springs += [x]
 			x.universe = self
+		self.max_id += 1
+		self.objects[self.max_id] = x
+		return self.max_id
 
 	def getForce(self, p):
 		F = vec3(0,0,0)
@@ -42,10 +48,10 @@ class Universe():
 		for p in self.particles:
 			p.update()
 		self.time += dt
-		self.steps += 1
 		self.updateEnergy()
-		if self.steps % 1e3 == 0:
+		if self.logging and self.steps % 1e3 == 0:
 			self.infolog()
+		self.steps += 1
 
 	def run(self, time = 1):
 		while abs(self.time - time) > 1e-7:
@@ -74,4 +80,4 @@ class Universe():
 				self.v += (s.k * extension ** 2) / 2
 	
 	def infolog(self):
-		print("total <K, V, E>:\t%f\t%f\t%f" % (self.k, self.v, self.k+self.v))
+		print("<t, K, V, E>:\t%.2f\t%f\t%f\t%f" % (self.time, self.k, self.v, self.k+self.v))

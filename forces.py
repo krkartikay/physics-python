@@ -11,7 +11,7 @@ class Force():
 
 class GravityForce(Force):
 	def __init__(self, g=vec3(0, 0, -1)):
-		self.g = g
+		self.g = vec3(g)
 
 	def getForce(self, p):
 		return p.mass * self.g
@@ -26,8 +26,8 @@ class SpringForce(Force):
 		return F
 
 class DragForce(Force):
-	def __init__(self, a=0.02):
-		self.a = a
+	def __init__(self, drag=0.02):
+		self.a = drag
 
 	def getForce(self, p: Particle):
 		F = - self.a * p.vel * p.vel.length()

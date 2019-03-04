@@ -16,23 +16,42 @@ univ = {}
 @socketio.on('connect')
 def on_connect():
 	univ[request.sid] = physics.Universe()
-	univ[request.sid].addForce(physics.GravityForce())
-	univ[request.sid].addForce(physics.DragForce())
-	univ[request.sid].addForce(physics.SpringForce())
 
 @socketio.on('init')
-def on_init():
-	p1 = physics.FixedParticle((0, 0, 5), (0, 0, 0), 1)
-	p2 = physics.Particle((0, 0, 0), (2, 0, 2), 1)
-	s1 = physics.Spring(p1, p2, k=100, damping=10)
-	univ[request.sid].add(p1)
-	univ[request.sid].add(p2)
-	univ[request.sid].add(s1)
+def init_forces(forces):
+	for f in forces:
+		print("xxxxx", f)
+		if isinstance(f, list):
+			args = f[1]
+			f = f[0]
+		else:
+			args = {}
+		try:
+			f = getattr(physics, f)
+			univ[request.sid].addForce(f(**args))
+		except AttributeError:
+			return "Failed"
+
+@socketio.on('ping')
+def ping(*data):
+	return "pong: " + str(data)
 
 @socketio.on('particle')
 def create_particle(pos, vel, mass):
 	p = physics.Particle(pos, vel, mass)
-	univ[request.sid].add(p)
+	return univ[request.sid].add(p) # returns particle id
+
+@socketio.on('fixed_particle')
+def create_fixed_particle(pos, mass):
+	p = physics.FixedParticle(pos, (0,0,0), mass)
+	return univ[request.sid].add(p)  # returns particle id
+
+@socketio.on('spring')
+def create_spring(pid1, pid2, options):
+	p1 = univ[request.sid].objects[pid1]
+	p2 = univ[request.sid].objects[pid2]
+	sp = physics.Spring(p1, p2, **options)
+	return univ[request.sid].add(sp)  # returns spring id
 
 @socketio.on('step')
 def take_step():
