@@ -60,6 +60,15 @@ async function initPhysics() {
 // ---------------------------------------------------------------------------
 
 function drawdata(data, t) {
+    var xScale = d3.scaleLinear()
+        .domain([-15 / zoom, 15 / zoom])
+        .range([0, w]);
+    var yScale = d3.scaleLinear()
+        .domain([-15 * (h / w) / zoom, 15 * (h / w) / zoom])
+        .range([h, 0]);
+    var massScale = d3.scaleLinear()
+        .domain([0, 10 / zoom])
+        .range([0, 50]);
     var circles = d3.select("#draw")
         .selectAll("circle")
         .data(data.particles);

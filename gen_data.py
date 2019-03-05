@@ -9,7 +9,7 @@ u.addForce(GroundForce())
 
 particles = []
 
-N = 3
+N = 5
 
 for i in range(N):
     a = 2*math.pi * i/N
@@ -28,10 +28,10 @@ u.add(px)
 
 for i in range(len(particles)):
     p1, p2 = particles[i], particles[i-1]
-    s = Spring(p1, p2, k=1000, damping=2)
+    s = Spring(p1, p2, k=5000, damping=10)
     u.add(s)
     p1, p2 = particles[i], px
-    s = Spring(p1, p2, k=1000, damping=2)
+    s = Spring(p1, p2, k=5000, damping=10)
     u.add(s)
 
 fl = open("data.txt", "w")
