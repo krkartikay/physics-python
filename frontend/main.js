@@ -22,7 +22,7 @@ var xScale = d3.scaleLinear()
     .domain([-15 / zoom, 15 / zoom])
     .range([0, w]);
 var yScale = d3.scaleLinear()
-    .domain([-10 / zoom, 10 / zoom])
+    .domain([-15*(h/w) / zoom, 15*(h/w) / zoom])
     .range([h, 0]);
 var massScale = d3.scaleLinear()
     .domain([0, 10 / zoom])

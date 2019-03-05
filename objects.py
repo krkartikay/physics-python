@@ -51,7 +51,7 @@ class Spring():
 			extension = (self.p2.pos - self.p1.pos).length() - self.l
 			direction = (self.p2.pos - self.p1.pos).unit()
 			springforce_magnitude = self.k*extension
-			dampingforce_magnitude = self.c * (self.p1.vel * direction)
+			dampingforce_magnitude = self.c * ((self.p1.vel - self.p2.vel) * direction)
 			magnitude = springforce_magnitude - dampingforce_magnitude
 			force = magnitude * direction
 			return force
@@ -59,7 +59,7 @@ class Spring():
 			extension = (self.p1.pos - self.p2.pos).length() - self.l
 			direction = (self.p1.pos - self.p2.pos).unit()
 			springforce_magnitude = self.k*extension
-			dampingforce_magnitude = self.c * (self.p2.vel * direction)
+			dampingforce_magnitude = self.c * ((self.p2.vel - self.p1.vel) * direction)
 			magnitude = springforce_magnitude - dampingforce_magnitude
 			force = magnitude * direction
 			return force

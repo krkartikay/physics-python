@@ -43,6 +43,13 @@ class ImpulsiveForce(Force):
 		return F
 
 
+class GroundForce(Force):
+	def getForce(self, p):
+		if p.pos.xyz[2] <= 0:
+			return vec3(0, 0, 1/p.universe.timestep)
+		else:
+			return vec3(0, 0, 0)
+
 class DragForce(Force):
 	def __init__(self, drag=0.02):
 		self.a = drag
