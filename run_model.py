@@ -27,5 +27,5 @@ def __run(setup, replay_speed, accuracy, total_time):
             d += '\n'
             fl.write(d)
             fl.flush()
-            for i in range(sim_step):
+            for i in range(int(sim_step)):
                 u.step()

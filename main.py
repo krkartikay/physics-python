@@ -71,6 +71,9 @@ def send_data():
 @socketio.on('saved_data')
 def send_saved_data(i):
 	global f
+	i -= 30
+	if i < 0:
+		i = 0
 	if i>=len(f):
 		f = open("data.txt").readlines()
 		return "restart"

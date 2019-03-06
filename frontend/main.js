@@ -123,10 +123,10 @@ async function setup() {
 
 
 function initDrawing() {
-    var xAxis = d3.axisBottom(xScale);
-    var yAxis = d3.axisLeft(yScale);
-    d3.select("#xAxis").call(xAxis).attr("transform", `translate(0,${h / 2})`);
-    d3.select("#yAxis").call(yAxis).attr("transform", `translate(${w / 2},0)`);
+    // var xAxis = d3.axisBottom(xScale);
+    // var yAxis = d3.axisLeft(yScale);
+    // d3.select("#xAxis").call(xAxis).attr("transform", `translate(0,${h / 2})`);
+    // d3.select("#yAxis").call(yAxis).attr("transform", `translate(${w / 2},0)`);
 }
 
 function loop() {

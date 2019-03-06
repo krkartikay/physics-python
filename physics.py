@@ -79,4 +79,4 @@ class Universe():
 	
 	def infolog(self):
 		self.updateEnergy()
-		print("<t, K, V, E>:\t%.5f\t%f\t%f\t%f" % (self.time, self.k, self.v, self.k+self.v))
+		print("<t, K, V, E>:\t%.3f\t\t%f\t%f\t%f" % (self.time, self.k, self.v, self.k+self.v))
