@@ -37,7 +37,6 @@ class Spring():
 		p1.connections += [self]
 		p2.connections += [self]
 		self.k = k
-		self.k2 = k/100
 		self.c = damping
 		if l is not None:
 			self.l = l

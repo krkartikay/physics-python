@@ -70,7 +70,12 @@ def send_data():
 
 @socketio.on('saved_data')
 def send_saved_data(i):
-	return eval(f[i%len(f)])
+	global f
+	if i>=len(f):
+		f = open("data.txt").readlines()
+		return "restart"
+	else:
+		return eval(f[i])
 
 if __name__ == '__main__':
 	socketio.run(app, port=5000, debug=True)

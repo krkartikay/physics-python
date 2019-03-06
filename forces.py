@@ -32,7 +32,7 @@ class QuadraticPotentialForce(Force):
 		self.k = k
 
 	def getForce(self, p):
-		return vec3(0,0, -self.k * p.pos.xyz[2])
+		return -self.k * p.pos
 
 class ImpulsiveForce(Force):
 	def getForce(self, p):
@@ -49,6 +49,22 @@ class GroundForce(Force):
 			return vec3(0, 0, 1/p.universe.timestep)
 		else:
 			return vec3(0, 0, 0)
+
+class WallForce(Force):
+	def __init__(self, a):
+		self.a = a
+
+	def getForce(self, p):
+		if self.a>0:
+			if p.pos.xyz[0] <= self.a:
+				return vec3(+1/p.universe.timestep, 0, 0)
+			else:
+				return vec3(0, 0, 0)
+		else:
+			if p.pos.xyz[0] >= self.a:
+				return vec3(-1/p.universe.timestep, 0, 0)
+			else:
+				return vec3(0, 0, 0)
 
 class DragForce(Force):
 	def __init__(self, drag=0.02):
